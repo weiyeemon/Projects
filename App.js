@@ -1,114 +1,152 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+
 
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import { StyleSheet,View,Alert,TouchableOpacity,Button} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+export default class App extends React.Component {
+  constructor(props){
+    super(props);
+    this.state={
+      gameState :
+      [[0,0,0],
+      [0,0,0],
+      [0,0,0]],
+      currentPlayer:1
+    }
+    
+  }
+  componentDidMount(){
+    this.initializeGame();
+  };
+  
+  initializeGame= ()=>{
+    this.setState({
+      gameState:
+      [[0,0,0],
+      [0,0,0],
+      [0,0,0]]
+    });
+  }
+  renderIcon=(row,col)=>{
+    var value =this.state.gameState[row][col];
+    switch(value){
+      case 1: return <Icon name="close" style={styles.tileX} />;
+      case -1: return <Icon name="circle-outline" style={styles.tileO} />;
+      default: return <View/>;
+    }
+  }
+  onTilePress=(row,col)=>{
+    var value =this.state.gameState[row][col];
+    if(value!==0) return;
+    var currentPlayer=this.state.currentPlayer;
+    var arr= this.state.gameState.slice();
+    arr[row][col]=currentPlayer;
+    this.setState({gameState:arr});
+    var nextPayer = (currentPlayer==1) ? -1 : 1;
+    this.setState({currentPlayer:nextPayer});
 
-const App: () => React$Node = () => {
+    var winner = this.getWinner();
+    if(winner==1) Alert.alert("Player1 win!!!");
+    this.initializeGame();
+
+    if(winner==-1) Alert.alert("Player2 win!!!");
+    this.initializeGame();
+  }
+  getWinner=()=>{
+    var array = this.state.gameState;
+    var sum;
+    for (let index = 0; index < 3; index++) {
+      sum = array[index][0]+array[index][1];array[index][2];
+      if (sum == 3)return 1;
+      else if(sum == -3) return -1;
+      
+    }
+    for (let index = 0; index < 3; index++) {
+      sum = array[0][index]+array[1][index];array[2][index];
+      if (sum == 3)return 1;
+      else if(sum == -3) return -1;
+      
+    }
+
+  sum = array[0][0]+array[1][1];array[2][2];
+    if (sum == 3)return 1;
+      else if(sum == -3) return -1;
+
+  sum = array[2][0]+array[1][1];array[0][2];
+      if (sum == 3)return 1;
+        else if(sum == -3) return -1; 
+
+  return 0;      
+  }
+  newGameStart=()=>{
+   this.initializeGame();
+  }
+ render(){
   return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+    <View style={styles.container}>
+      <View style={{flexDirection:'row'}}>
+      <TouchableOpacity onPress={()=>this.onTilePress(0,0)} style={[styles.tile, {borderLeftWidth:0,borderTopWidth:0}]}>
+       {this.renderIcon(0,0)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(0,1)} style={[styles.tile,{borderTopWidth:0}]}>
+      {this.renderIcon(0,1)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(0,2)} style={[styles.tile, {borderRightWidth:0,borderTopWidth:0}]}>
+      {this.renderIcon(0,2)}
+      </TouchableOpacity>
+      </View>
+
+      <View style={{flexDirection:'row'}}>
+      <TouchableOpacity onPress={()=>this.onTilePress(1,0)} style={[styles.tile, {borderLeftWidth:0}]}>
+      {this.renderIcon(1,0)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(1,1)} style={styles.tile}>
+      {this.renderIcon(1,1)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(1,2)} style={[styles.tile, {borderRightWidth:0}]}>
+      {this.renderIcon(1,2)}
+      </TouchableOpacity>
+      </View>
+
+      <View style={{flexDirection:'row'}}>
+      <TouchableOpacity onPress={()=>this.onTilePress(2,0)} style={[styles.tile, {borderLeftWidth:0,borderBottomWidth:0}]}>
+      {this.renderIcon(2,0)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(2,1)} style={[styles.tile, {borderBottomWidth:0}]}>
+      {this.renderIcon(2,1)}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={()=>this.onTilePress(2,2)} style={[styles.tile, {borderRightWidth:0,borderBottomWidth:0}]}>
+      {this.renderIcon(2,2)}
+      </TouchableOpacity>
+      </View>
+      <Button title="new game" onPress={this.newGameStart}/>
+    </View>
   );
+ } 
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  container:{
+    flex:1,
+    backgroundColor:'#fff',
+    alignItems:'center',
+    justifyContent:'center'
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  tile:{
+    borderWidth:3,
+    width:100,
+    height:100
   },
-  body: {
-    backgroundColor: Colors.white,
+  tileX:{
+    color:'red',
+    fontSize : 68,
+    
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
+  tileO:{
+    color:'green',
+    fontSize : 68,
+  }
+    
 });
 
-export default App;
